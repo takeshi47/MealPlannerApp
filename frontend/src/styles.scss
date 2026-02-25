@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
-// --- "どうぶつの森"風カラーパレット ---
+// --- "どうぶつの森"風カラーパレット定義 ---
 $ac-sky: #87ceeb; // 空色
 $ac-green: #5cb85c; // 葉っぱの緑
 $ac-brown: #8b4513; // 木の茶色
@@ -10,8 +10,6 @@ $ac-orange: #ff7f50; // オレンジ (アクセント)
 $ac-font: 'M PLUS Rounded 1c', sans-serif;
 
 // --- Bootstrapの変数を上書き ---
-// @useの前に変数を定義するか、@use 'bootstrap/scss/bootstrap' with (...) を使います。
-// ここでは簡略化のため、標準的なオーバーライド手法を採用します。
 $primary: $ac-green;
 $body-bg: $ac-sky;
 $body-color: $ac-text;
@@ -26,8 +24,9 @@ $border-radius-lg: 2rem;
   $body-color: $ac-text,
   $font-family-sans-serif: $ac-font,
   $border-radius: 1.5rem,
-  $border-radius-lg: 2rem,
+  $border-radius-lg: 2rem
 );
+
 @use 'bootstrap-icons/font/bootstrap-icons.scss';
 
 body {
@@ -36,8 +35,8 @@ body {
   color: $ac-text;
 }
 
-// --- "どうぶつの森"風カード共通クラス ---
-.ac-card {
+// --- カード共通クラス ---
+.card {
   background: $ac-cream;
   border-radius: 2rem;
   border: 4px solid $ac-brown;
@@ -50,7 +49,10 @@ body {
   padding: 1.5rem;
   margin-bottom: 1rem;
 
-  h2, h3, h4, h5 {
+  h2,
+  h3,
+  h4,
+  h5 {
     font-weight: 800;
     color: $ac-brown;
   }
@@ -64,9 +66,17 @@ body {
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
-.text-brown { color: $ac-brown !important; }
-.fw-800 { font-weight: 800 !important; }
-.border-brown { border-color: $ac-brown !important; }
+.text-brown {
+  color: $ac-brown !important;
+}
+
+.fw-800 {
+  font-weight: 800 !important;
+}
+
+.border-brown {
+  border-color: $ac-brown !important;
+}
 
 .btn-outline-brown {
   color: $ac-brown;
@@ -77,14 +87,14 @@ body {
   }
 }
 
-// --- ボタンのカスタマイズ ---
 .btn-primary {
   border: none;
   font-weight: 700;
   box-shadow: 0 5px 0px 0px darken($ac-green, 15%);
   transition: all 0.1s ease-in-out;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     transform: translateY(2px);
     box-shadow: 0 3px 0px 0px darken($ac-green, 15%);
     background-color: darken($ac-green, 5%);
@@ -96,8 +106,9 @@ body {
   }
 }
 
-.form-control, .form-select {
-  background-color: #fafafa; // 背景を白に固定して視認性を向上
+.form-control,
+.form-select {
+  background-color: #fafafa;
   border: 3px solid darken($ac-cream, 15%);
   border-radius: 1.5rem;
   &:focus {

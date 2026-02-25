@@ -6,7 +6,7 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="modal-body">
     <!-- 日付入力フィールド -->
-    <div class="ac-card mb-4 bg-white border-3">
+    <div class="card mb-4 bg-white border-3">
       <label for="date" class="h5 fw-bold mb-2 d-block">いつたべる？</label>
       <input
         id="date"
@@ -29,12 +29,12 @@
     </div>
 
     <!-- 食事(meals)のFormArrayを描画するセクション -->
-    <div formArrayName="meals">
+    <div class="card" formArrayName="meals">
       <h3 class="h4 fw-800 mb-3 ps-2">なにをたべる？</h3>
 
       <!-- 各食事を @for でループして描画 -->
       @for (meal of meals.controls; track meal; let i = $index) {
-        <div [formGroupName]="i" class="ac-card mb-4 border-2 shadow-sm" style="background: rgba(255,255,255,0.5)">
+        <div [formGroupName]="i" class="card mb-4 border-2 shadow-sm" style="background: rgba(255,255,255,0.5)">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="h5 fw-bold mb-0 text-brown">ごはん {{ i + 1 }}</h4>
             @if (canRemoveMeal()) {
