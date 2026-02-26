@@ -32,32 +32,40 @@ export class DailyFormComponent implements OnInit {
   private dailyService = inject(DailyService);
   private menuService = inject(MenuService);
   private cdr = inject(ChangeDetectorRef);
-  activeModal = inject(NgbActiveModal);
+  private activeModal = inject(NgbActiveModal);
 
   private csrfToken: string | null = null;
   protected menusChoices: Menu[] | null = null;
   protected errorMessages: BackendFormErrors | null = null;
 
   // フォーム全体を管理するFormGroup
-  form!: FormGroup;
+  protected form!: FormGroup;
 
-  readonly BREAKFAST = 'breakfast';
-  readonly LUNCH = 'lunch';
-  readonly DINNER = 'dinner';
+  protected mealTypeChoices: { value: string; label: string }[] = [];
 
-  // todo: バックエンドから取得するように修正
-  readonly MEAL_TYPE_CHOICES = [this.BREAKFAST, this.LUNCH, this.DINNER];
-
-  // todo: バックエンドから取得するように修正
-  readonly MEALS_MAX = 3;
-  readonly MEALS_MIN = 1;
-  readonly MENUS_MIN = 1;
+  private mealsMax = 1;
+  private mealsMin = 1;
+  private menusMin = 1;
 
   ngOnInit(): void {
     this.initForm();
 
     this.menuService.fetchAll().subscribe((menus) => {
       this.menusChoices = menus;
+      this.cdr.markForCheck();
+    });
+
+    this.dailyService.getInitData().subscribe((data) => {
+      this.mealTypeChoices = data.mealTypes;
+      this.mealsMin = data.config.mealsMin;
+      this.mealsMax = data.config.mealsMax;
+      this.menusMin = data.config.menusMin;
+
+      if (!this.daily && this.meals.length > 0 && data.mealTypes.length > 0) {
+        const firstMeal = this.meals.at(0);
+        firstMeal.patchValue({ mealType: data.mealTypes[0].value });
+      }
+
       this.cdr.markForCheck();
     });
 
@@ -88,7 +96,6 @@ export class DailyFormComponent implements OnInit {
       _token: this.csrfToken,
     };
 
-    // ここで、整形したデータをService経由でバックエンドAPIにPOSTします
     this.dailyService.create(payload).subscribe({
       next: () => {
         if (confirm('registration completed!')) this.close();
@@ -112,8 +119,7 @@ export class DailyFormComponent implements OnInit {
       _token: this.csrfToken,
     };
 
-    // ここで、整形したデータをService経由でバックエンドAPIにPOSTします
-    this.dailyService.update(this.daily?.id, payload).subscribe({
+    this.dailyService.update(this.daily.id, payload).subscribe({
       next: () => {
         if (confirm('registration completed!')) this.close();
       },
@@ -127,17 +133,12 @@ export class DailyFormComponent implements OnInit {
   }
 
   private initForm(): void {
-    // フォームの構造を初期化
     this.form = this.fb.group({
-      // 日付フィールド。必須入力とし、初期値に今日の日付を設定
       date: [this.daily?.date.substring(0, 10) ?? this.baseDate, Validators.required],
-      // 食事の配列を管理するFormArray
       meals: this.fb.array([]),
     });
 
     if (this.daily?.meals && this.daily.meals.length > 0) {
-      // dailyId が存在し、データが取得できた場合
-
       this.daily.meals.forEach((meal) => {
         const mealFormGroup = this.newMeal(meal.mealType);
         const mealFormArray = mealFormGroup.get('menu') as FormArray;
@@ -155,9 +156,9 @@ export class DailyFormComponent implements OnInit {
         this.meals.push(mealFormGroup);
       });
     } else {
-      // dailyId が存在しない、またはデータが取得できなかった場合
+      // dailyId が存在しない、またはデータが取得できなかった場合、
       // 初期状態で「朝食」の入力欄を一つ追加しておく
-      this.addMeal(this.BREAKFAST);
+      this.addMeal();
     }
   }
 
@@ -177,11 +178,11 @@ export class DailyFormComponent implements OnInit {
   }
 
   protected canAddMeal(): boolean {
-    return this.meals.length < this.MEALS_MAX;
+    return this.meals.length < this.mealsMax;
   }
 
   protected canRemoveMeal(): boolean {
-    return this.meals.length > this.MEALS_MIN;
+    return this.meals.length > this.mealsMin;
   }
 
   // protected canAddMenu(): boolean {
@@ -189,7 +190,7 @@ export class DailyFormComponent implements OnInit {
   // }
 
   protected canRemoveMenu(mealIndex: number): boolean {
-    return this.getMenus(mealIndex).length > this.MENUS_MIN;
+    return this.getMenus(mealIndex).length > this.menusMin;
   }
 
   /**
@@ -249,7 +250,6 @@ export class DailyFormComponent implements OnInit {
    * @param mealIndex メニューを追加する食事のインデックス
    */
   addMenu(mealIndex: number): void {
-    // 本来はメニュー選択ダイアログなどを表示してIDを取得しますが、ここでは空のコントロールを追加します
     this.getMenus(mealIndex).push(this.menuForm());
   }
 

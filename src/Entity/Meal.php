@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\MealType;
 use App\Repository\MealRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -32,6 +33,8 @@ class Meal
         self::LUNCH,
         self::DINNER,
     ];
+
+    public const MENUS_MIN = 1;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

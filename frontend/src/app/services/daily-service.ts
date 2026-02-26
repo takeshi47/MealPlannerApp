@@ -3,6 +3,15 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Daily } from '../models/daily';
 
+export interface DailyInitData {
+  mealTypes: { value: string; label: string }[];
+  config: {
+    mealsMax: number;
+    mealsMin: number;
+    menusMin: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -32,5 +41,9 @@ export class DailyService {
 
   fetchById(dailyId: number): Observable<Daily> {
     return this.http.get<Daily>(`${this.baseUrl}/${dailyId}`);
+  }
+
+  getInitData(): Observable<DailyInitData> {
+    return this.http.get<DailyInitData>(`${this.baseUrl}/init-data`);
   }
 }

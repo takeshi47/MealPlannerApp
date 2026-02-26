@@ -6,6 +6,8 @@ namespace App\Controller\Api;
 
 use App\Criteria\DailyFetchCriteria;
 use App\Entity\Daily;
+use App\Entity\Meal;
+use App\Enum\MealType;
 use App\Form\DailyFetchType;
 use App\Form\DailyType;
 use App\UseCase\DailyFetchUseCase;
@@ -73,5 +75,18 @@ final class DailyController extends AbstractController
         }
 
         return $this->json($this->getErrorsFromForm($form), Response::HTTP_BAD_REQUEST);
+    }
+
+    #[Route('/init-data', name: 'init_data', methods: ['GET'])]
+    public function getInitData(): Response
+    {
+        return $this->json([
+            'mealTypes' => MealType::getChoices(),
+            'config' => [
+                'mealsMax' => Daily::MEALS_MAX,
+                'mealsMin' => Daily::MEALS_MIN,
+                'menusMin' => Meal::MENUS_MIN,
+            ],
+        ]);
     }
 }
