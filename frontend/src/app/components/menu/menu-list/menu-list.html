@@ -1,11 +1,40 @@
-<p>menu-list works!</p>
-<p><a [routerLink]="['/menu/create']">menu form</a></p>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">メニュー一覧</h2>
+    <button (click)="openMenuForm()">あたらしいメニュー</button>
+  </div>
 
-@if (menus$ | async; as menus) {
-  @for (menu of menus; track $index) {
-    <p>
-      <a [routerLink]="['/menu', menu.id]">{{ menu.name }}</a>
-    </p>
-    <p><a [routerLink]="['/menu/edit', menu.id]">menu edit</a></p>
+  @if (menus$ | async; as menus) {
+    <div class="table-responsive bg-white shadow-sm rounded">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">メニュー名</th>
+            <th scope="col">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (menu of menus; track menu.id) {
+            <tr>
+              <td>{{ menu.id }}</td>
+              <td>{{ menu.name }}</td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-secondary" (click)="openMenuForm()">編集</button>
+                  <button class="btn btn-outline-danger">削除</button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3" class="text-center py-4 text-muted">
+                メニューが登録されてないってばよ！
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
-}
+</div>

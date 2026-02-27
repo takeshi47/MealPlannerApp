@@ -20,7 +20,6 @@ $border-radius-lg: 2rem;
 /* Importing Bootstrap SCSS file. */
 @use 'bootstrap/scss/bootstrap.scss' with (
   $primary: $ac-green,
-  $body-bg: $ac-sky,
   $body-color: $ac-text,
   $font-family-sans-serif: $ac-font,
   $border-radius: 1.5rem,
@@ -31,7 +30,6 @@ $border-radius-lg: 2rem;
 
 body {
   font-family: $ac-font;
-  background-color: $ac-sky;
   color: $ac-text;
 }
 
