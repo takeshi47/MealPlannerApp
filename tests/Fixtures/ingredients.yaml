@@ -1,0 +1,13 @@
+App\Entity\Ingredient:
+    ingredient_1:
+        name: "にんじん"
+        isStock: true
+    ingredient_2:
+        name: "たまねぎ"
+        isStock: true
+    ingredient_3:
+        name: "じゃがいも"
+        isStock: false
+    ingredient_{4..10}:
+        name: "テスト材料 <current()>"
+        isStock: true
