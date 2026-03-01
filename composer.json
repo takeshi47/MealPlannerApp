@@ -71,6 +71,14 @@
         "check": [
             "@fix",
             "@stan"
+        ],
+        "e2e": [
+            "symfony server:stop",
+            "APP_ENV=test symfony serve -d",
+            "php bin/console c:c --env=test",
+            "php bin/console doctrine:schema:update --env=test --force",
+            "php bin/console doctrine:fixtures:load --env=test --no-interaction",
+            "cd frontend && yarn cypress open"
         ]
     },
     "conflict": {
