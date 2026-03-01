@@ -115,3 +115,8 @@ body {
     box-shadow: 0 0 0 0.25rem rgba($ac-orange, 0.3);
   }
 }
+
+.form-control::placeholder {
+  color: #757575 !important;
+  opacity: 1;
+}
