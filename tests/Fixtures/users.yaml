@@ -1,0 +1,6 @@
+App\Entity\User:
+    user_admin:
+        email: "admin@example.com"
+        roles: ["ROLE_ADMIN"]
+        password: "$$argon2id$$v=19$$m=65536,t=3,p=4$$Z29uemFsZXo$$SInFpL9YI+Vf5D0Xf2Xf8A" # password (escaped $)
+        displayName: "Admin User"
