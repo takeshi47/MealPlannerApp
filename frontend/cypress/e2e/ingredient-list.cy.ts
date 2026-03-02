@@ -40,10 +40,16 @@ describe('材料フォームのテスト', () => {
     cy.contains('じゃがいも').should('be.visible');
   });
 
-  it('在庫無しの表示確認', () => {
-    cy.contains('材料').click();
-    cy.contains('じゃがいも').parent().children().children().should('have.class', 'bg-secondary');
-    cy.contains('No').should('be.visible');
+  it('在庫状態（Yes/No）に応じてバッジの色と文言が正しいこと', () => {
+    // 在庫あり (isStock: true) -> bg-success (Yes)
+    cy.contains('tr', 'にんじん').within(() => {
+      cy.get('.badge').should('have.class', 'bg-success').and('contain', 'Yes');
+    });
+
+    // 在庫なし (isStock: false) -> bg-secondary (No)
+    cy.contains('tr', 'じゃがいも').within(() => {
+      cy.get('.badge').should('have.class', 'bg-secondary').and('contain', 'No');
+    });
   });
 
   it('材料を削除できること', () => {
