@@ -16,6 +16,10 @@ class UniqueMealTypePerDayValidator extends ConstraintValidator
             return;
         }
 
+        if (!$constraint instanceof UniqueMealTypePerDay) {
+            return;
+        }
+
         $result = [];
 
         foreach ($daily->getMeals() as $meal) {
@@ -33,21 +37,6 @@ class UniqueMealTypePerDayValidator extends ConstraintValidator
 
             $result[$type] = true;
         }
-
-        // foreach ($value->meals as $meal) {
-        //     $type = $meal->mealType;
-
-        //     if (isset($seen[$type])) {
-        //         $this->context
-        //             ->buildViolation($constraint->message)
-        //             ->setParameter('{{ mealType }}', $type)
-        //             ->addViolation();
-
-        //         return;
-        //     }
-
-        //     $seen[$type] = true;
-        // }
 
         return;
     }
