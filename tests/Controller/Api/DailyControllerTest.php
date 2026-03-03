@@ -49,7 +49,7 @@ class DailyControllerTest extends WebTestCase
         $data = json_decode($responseContent, true);
         $this->assertArrayHasKey('mealTypes', $data);
         $this->assertArrayHasKey('config', $data);
-        
+
         $mealTypeValues = array_column($data['mealTypes'], 'value');
         $this->assertContains('breakfast', $mealTypeValues);
     }
@@ -76,7 +76,7 @@ class DailyControllerTest extends WebTestCase
         $this->assertJson($responseContent);
 
         $data = json_decode($responseContent, true);
-        
+
         // 戻り値は数値添字配列なので、dateフィールドを持つ要素があるか確認
         $dates = array_map(fn($item) => (new \DateTime($item['date']))->format('Y-m-d'), $data);
         $this->assertContains('2026-03-01', $dates);
