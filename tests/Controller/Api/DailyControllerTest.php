@@ -87,8 +87,7 @@ class DailyControllerTest extends WebTestCase
      */
     public function testCreate(): void
     {
-        // CSRFトークンの取得 (DailyTypeのIDは daily)
-        $this->client->request('GET', '/api/daily/csrf-token/daily');
+        $this->client->request('GET', '/api/daily/csrf-token/daily_create');
         $csrfToken = json_decode($this->client->getResponse()->getContent(), true)['token'];
 
         $menuRepo = self::getContainer()->get('doctrine')->getRepository(Menu::class);
@@ -127,8 +126,8 @@ class DailyControllerTest extends WebTestCase
      */
     public function testUpdate(): void
     {
-        // CSRFトークンの取得
-        $this->client->request('GET', '/api/daily/csrf-token/daily');
+        // CSRFトークンの取得 (DailyTypeのIDは daily_form)
+        $this->client->request('GET', '/api/daily/csrf-token/daily_create');
         $csrfToken = json_decode($this->client->getResponse()->getContent(), true)['token'];
 
         $dailyRepo = self::getContainer()->get('doctrine')->getRepository(Daily::class);
