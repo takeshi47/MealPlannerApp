@@ -10,7 +10,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class UniqueMealTypePerDayValidator extends ConstraintValidator
 {
-    public function validate($daily, Constraint $constraint): void
+    public function validate(mixed $daily, Constraint $constraint): void
     {
         if (!$daily instanceof Daily) {
             return;
