@@ -1,75 +1,73 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Ingredients</h2>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">材料リスト</h2>
   </div>
 
-  @if (ingredients && ingredients.length > 0) {
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Stock?</th>
-            <th scope="col" class="text-end">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (ingredient of ingredients; track ingredient.id) {
-            @if (isEdit(ingredient.id)) {
-              <tr
-                app-ingredient-form
-                [ingredient]="ingredient"
-                [csrfToken]="csrfToken"
-                (cancelForm)="cancelEditing($event)"
-                (complete)="completeEdit($event)"
-              ></tr>
-            } @else {
-              <tr>
-                <td>
-                  {{ ingredient.name }}
-                </td>
-                <td>
-                  @if (ingredient.isStock) {
-                    <span class="badge bg-success">Yes</span>
-                  } @else {
-                    <span class="badge bg-secondary">No</span>
-                  }
-                </td>
-                <td class="text-end">
-                  <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-info" (click)="enableEdit(ingredient.id)">
-                      編集
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" (click)="delete(ingredient.id)">
-                      削除
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          }
-          @if (isAdd) {
+  <div class="table-responsive bg-white shadow-sm rounded">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">材料名</th>
+          <th scope="col">在庫あり？</th>
+          <th scope="col" class="text-end px-4">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ingredient of ingredients; track ingredient.id) {
+          @if (isEdit(ingredient.id)) {
             <tr
               app-ingredient-form
+              [ingredient]="ingredient"
               [csrfToken]="csrfToken"
-              (cancelForm)="cancelAdd()"
-              (complete)="completeAdd()"
+              (cancelForm)="cancelEditing($event)"
+              (complete)="completeEdit($event)"
             ></tr>
-          }
-          @if (!isAdd) {
+          } @else {
             <tr>
-              <td [colSpan]="3" class="text-end">
-                <button class="btn btn-sm btn-secondary" (click)="enableAdd()">追加</button>
+              <td class="px-3">
+                {{ ingredient.name }}
+              </td>
+              <td>
+                @if (ingredient.isStock) {
+                  <span class="badge bg-success">あり</span>
+                } @else {
+                  <span class="badge bg-secondary">なし</span>
+                }
+              </td>
+              <td class="text-end px-4">
+                <div class="btn-group btn-group-sm">
+                  <!-- btn-group-sm 追加 -->
+                  <button class="btn btn-outline-secondary" (click)="enableEdit(ingredient.id)">
+                    編集
+                  </button>
+                  <button class="btn btn-outline-danger" (click)="delete(ingredient.id)">
+                    削除
+                  </button>
+                </div>
               </td>
             </tr>
           }
-        </tbody>
-      </table>
-    </div>
-  } @else {
-    <div class="text-center p-5 border rounded bg-light">
-      <p class="lead">No ingredients found.</p>
-      <p>Get started by creating a new one!</p>
-    </div>
-  }
+        } @empty {
+          <!-- ingredients が空の場合の表示 -->
+          <tr>
+            <td colspan="3" class="text-center py-5 text-muted">材料が登録されてないよ</td>
+          </tr>
+        }
+        @if (isAdd) {
+          <tr
+            app-ingredient-form
+            [csrfToken]="csrfToken"
+            (cancelForm)="cancelAdd()"
+            (complete)="completeAdd()"
+          ></tr>
+        }
+        <tr>
+          <td colspan="3">
+            <button class="btn btn-primary d-block w-100" (click)="enableAdd()">新しい材料を登録する
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
