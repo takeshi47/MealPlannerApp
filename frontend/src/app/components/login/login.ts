@@ -16,8 +16,8 @@ export class Login implements OnInit {
   private csrfToken = '';
 
   form = this.fb.group({
-    email: [null, [Validators.required]],
-    password: [null, [Validators.required]],
+    email: ['admin_test01@example.com', [Validators.required]],
+    password: ['adminadmin', [Validators.required]],
   });
 
   ngOnInit(): void {
