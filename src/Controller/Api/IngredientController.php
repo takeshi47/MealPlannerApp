@@ -75,6 +75,10 @@ final class IngredientController extends AbstractController
             return $this->json(['error' => 'Invalid CSRF TOKEN'], Response::HTTP_BAD_REQUEST);
         }
 
+        if (!$ingredient->canDelete()) {
+            return $this->json(['error' => 'この材料はメニューに紐付いているため削除できません。'], Response::HTTP_BAD_REQUEST);
+        }
+
         $entityManager->remove($ingredient);
         $entityManager->flush();
 

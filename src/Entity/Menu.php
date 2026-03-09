@@ -31,7 +31,7 @@ class Menu
     /**
      * @var Collection<int, Ingredient>
      */
-    #[ORM\ManyToMany(targetEntity: Ingredient::class)]
+    #[ORM\ManyToMany(targetEntity: Ingredient::class, inversedBy: 'menus')]
     #[Assert\Count(min: 1)]
     private Collection $ingredients;
 
@@ -69,6 +69,7 @@ class Menu
     {
         if (!$this->ingredients->contains($ingredient)) {
             $this->ingredients->add($ingredient);
+            $ingredient->addMenu($this);
         }
 
         return $this;
@@ -76,7 +77,9 @@ class Menu
 
     public function removeIngredient(Ingredient $ingredient): static
     {
-        $this->ingredients->removeElement($ingredient);
+        if ($this->ingredients->removeElement($ingredient)) {
+            $ingredient->removeMenu($this);
+        }
 
         return $this;
     }
