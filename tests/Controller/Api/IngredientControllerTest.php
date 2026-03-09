@@ -11,6 +11,7 @@ use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class IngredientControllerTest extends WebTestCase
 {
@@ -116,7 +117,7 @@ class IngredientControllerTest extends WebTestCase
     public function testDelete(): void
     {
         $repo = self::getContainer()->get('doctrine')->getRepository(Ingredient::class);
-        $ingredient = $repo->findOneBy(['name' => 'たまねぎ']);
+        $ingredient = $repo->findOneBy(['name' => '削除用材料']);
         $id = $ingredient->getId();
 
         $this->client->request('GET', '/api/ingredient/csrf-token/ingredient_form');
@@ -134,5 +135,38 @@ class IngredientControllerTest extends WebTestCase
 
         self::getContainer()->get('doctrine')->getManager()->clear();
         $this->assertNull($repo->find($id));
+    }
+
+    /**
+     * Menuに紐づいているIngredientは削除不可のテスト.
+     */
+    public function testDeleteLinkedToMenuFails(): void
+    {
+        $repo = self::getContainer()->get('doctrine')->getRepository(Ingredient::class);
+        $ingredient = $repo->findOneBy(['name' => 'にんじん']);
+        $id = $ingredient->getId();
+
+        $this->client->request('GET', '/api/ingredient/csrf-token/ingredient_form');
+        $csrfToken = json_decode($this->client->getResponse()->getContent(), true)['token'];
+
+        $this->client->request(
+            'DELETE',
+            "/api/ingredient/delete/$id",
+            [],
+            [],
+            ['HTTP_X-CSRF-TOKEN' => $csrfToken]
+        );
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+
+        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertJson($responseContent);
+
+        $data = json_decode($responseContent, true);
+        $this->assertSame('この材料はメニューに紐付いているため削除できません。', $data['error']);
+
+        // データベースから消えていないことを確認
+        self::getContainer()->get('doctrine')->getManager()->clear();
+        $this->assertNotNull($repo->find($id));
     }
 }

@@ -11,3 +11,6 @@ App\Entity\Ingredient:
     ingredient_{4..10}:
         name: "テスト材料 <current()>"
         isStock: true
+    ingredient_11: # 削除用材料 (どのメニューにも紐づけない)
+        name: "削除用材料"
+        isStock: false
