@@ -230,7 +230,7 @@ describe('献立登録フォームのテスト', () => {
     cy.wait('@createDailyError');
 
     cy.get('input#date').should('have.class', 'is-invalid');
-    cy.contains('この日付はすでに登録されています。').should('be.visible');
+    cy.contains('この日付はすでに登録されています。').scrollIntoView().should('be.visible');
   });
 
   it('必須項目が未入力の場合に送信ボタンが非活性であること (異常系)', () => {
