@@ -1,4 +1,11 @@
 describe('材料フォームのテスト', () => {
+  interface IngredientResponse {
+    id: number;
+    name: string;
+    isStock: boolean;
+    canDelete: boolean;
+  }
+
   before(() => {
     // todo: ｃｙ．ｔｓ側で直接実行しない
     cy.exec('php ../bin/console doctrine:fixtures:load --no-interaction --env=test');
@@ -9,6 +16,7 @@ describe('材料フォームのテスト', () => {
     cy.intercept('GET', '**/api/ingredient/csrf-token/ingredient_form').as('getCsrfToken');
     cy.intercept('POST', '**/api/ingredient/new').as('createIngredient');
     cy.intercept('POST', '**/api/ingredient/edit/*').as('updateIngredient');
+    cy.intercept('DELETE', '**/api/ingredient/delete/*').as('deleteIngredient');
 
     // ログイン処理
     cy.visit('/login');
@@ -16,23 +24,18 @@ describe('材料フォームのテスト', () => {
     cy.get('input[formControlName="password"]').clear().type('password');
     cy.get('button[type="submit"]').click();
 
-    // ホーム画面遷移確認
     cy.url().should('include', '/home');
 
-    // 【修正】直接材料一覧画面へ遷移
     cy.visit('/ingredient/list');
 
-    // 画面遷移が完了したことを確認（URLと見出しの両方で検証）
     cy.url().should('include', '/ingredient/list');
-    cy.contains('h2', 'Ingredients').should('be.visible');
+    cy.contains('h2', '材料リスト').should('be.visible');
 
-    // コンポーネント初期化時のトークン取得を待機
-    // これにより、個別のテストケースで二重に wait する必要がなくなります
     cy.wait('@getCsrfToken');
   });
 
   it('ログインして材料一覧が表示されること', () => {
-    cy.get('tbody tr').filter(':contains("削除")').should('have.length', 10);
+    cy.get('tbody tr').filter(':contains("編集")').should('have.length', 11);
 
     // ingredients.yaml で定義したデータが表示されているか検証
     cy.contains('にんじん').should('be.visible');
@@ -40,32 +43,16 @@ describe('材料フォームのテスト', () => {
     cy.contains('じゃがいも').should('be.visible');
   });
 
-  it('在庫状態（Yes/No）に応じてバッジの色と文言が正しいこと', () => {
+  it('在庫状態（あり/なし）に応じてバッジの色と文言が正しいこと', () => {
     // 在庫あり (isStock: true) -> bg-success (Yes)
     cy.contains('tr', 'にんじん').within(() => {
-      cy.get('.badge').should('have.class', 'bg-success').and('contain', 'Yes');
+      cy.get('.badge').should('have.class', 'bg-success').and('contain', 'あり');
     });
 
     // 在庫なし (isStock: false) -> bg-secondary (No)
     cy.contains('tr', 'じゃがいも').within(() => {
-      cy.get('.badge').should('have.class', 'bg-secondary').and('contain', 'No');
+      cy.get('.badge').should('have.class', 'bg-secondary').and('contain', 'なし');
     });
-  });
-
-  it('材料を削除できること', () => {
-    const targetName = 'じゃがいも';
-
-    // ブラウザの確認ダイアログを自動的にOKにする
-    cy.on('window:confirm', () => true);
-    cy.intercept('DELETE', '**/api/ingredient/delete/**').as('deleteIngredient');
-
-    cy.contains('tr', targetName).within(() => {
-      cy.contains('削除').click();
-    });
-
-    cy.wait('@deleteIngredient').its('response.statusCode').should('eq', 200);
-
-    cy.contains(targetName).should('not.exist');
   });
 
   it('材料が0件の時に適切なメッセージが表示されること', () => {
@@ -77,17 +64,16 @@ describe('材料フォームのテスト', () => {
     cy.wait('@getEmptyIngredients');
 
     // 空状態のメッセージが表示されているか確認
-    cy.contains('No ingredients found.').should('be.visible');
-    cy.contains('Get started by creating a new one!').should('be.visible');
+    cy.contains('材料が登録されてないよ').should('be.visible');
   });
 
-  it('新しい材料を追加できること', () => {
+  it('新しい材料を新しい材料を登録するできること', () => {
     const targetName = 'なす';
 
     // 画面遷移と初期表示の確認
-    cy.contains('h2', 'Ingredients').should('be.visible');
+    cy.contains('h2', '材料リスト').should('be.visible');
 
-    cy.contains('追加').click();
+    cy.contains('新しい材料を登録する').click();
     cy.get('tr[app-ingredient-form]').as('ingredientForm');
 
     cy.get('@ingredientForm').within(() => {
@@ -157,9 +143,7 @@ describe('材料フォームのテスト', () => {
   });
 
   it('nameが空の場合、バリデーションエラーが表示されること', () => {
-    console.log(1);
-
-    cy.contains('追加').click();
+    cy.contains('新しい材料を登録する').click();
     cy.get('tr[app-ingredient-form]').as('ingredientForm');
 
     cy.get('@ingredientForm').within(() => {
@@ -178,7 +162,7 @@ describe('材料フォームのテスト', () => {
   it('nameが31文字以上の場合にエラーが表示されること', () => {
     const longName = 'a'.repeat(31);
 
-    cy.contains('追加').click();
+    cy.contains('新しい材料を登録する').click();
 
     const ingredientForm = cy.get('tr[app-ingredient-form]').as('ingredientForm');
 
@@ -198,7 +182,7 @@ describe('材料フォームのテスト', () => {
   it('既に存在する名前を登録しようとした場合にエラーが表示されること', () => {
     const duplicateName = 'たまねぎ';
 
-    cy.contains('追加').click();
+    cy.contains('新しい材料を登録する').click();
     const ingredientForm = cy.get('tr[app-ingredient-form]').as('ingredientForm');
 
     ingredientForm.within(() => {
@@ -231,5 +215,57 @@ describe('材料フォームのテスト', () => {
       .eq(1)
       .find('input[formControlName="name"]')
       .should('have.value', 'テスト材料 5');
+  });
+
+  it('材料一覧の各行で canDelete の値に応じて削除ボタンの表示・非表示が正しく制御されていること', () => {
+    cy.intercept('GET', '**/api/ingredient').as('getIngredients');
+    cy.visit('/ingredient/list');
+
+    cy.wait('@getIngredients').then((interception) => {
+      const ingredients = interception.response?.body as IngredientResponse[];
+
+      ingredients.forEach((ingredient) => {
+        cy.contains('tr', ingredient.name).within(() => {
+          if (ingredient.canDelete === false) {
+            // canDelete が false なら削除ボタンが存在しないこと
+            cy.get('button.btn-outline-danger').should('not.exist');
+          } else {
+            // canDelete が true なら削除ボタンが存在すること
+            cy.get('button.btn-outline-danger').should('exist');
+          }
+        });
+      });
+    });
+  });
+
+  it('削除ボタンが表示されている材料を削除できること', () => {
+    // 1. テーブルの行から「削除ボタン」が表示されている行を検索
+    cy.get('tbody tr').filter(':has(button.btn-outline-danger)').first().as('targetRow');
+
+    // 2. 見つけた行のnameを変数に入れて保持
+    cy.get('@targetRow').within(() => {
+      cy.get('td')
+        .first()
+        .invoke('text')
+        .then((text) => {
+          const targetName = text.trim();
+          cy.wrap(targetName).as('targetName');
+
+          // 3. 見つけた行の削除ボタンを押下
+          cy.get('button.btn-outline-danger').click();
+        });
+    });
+
+    // 4. 削除されたことを確認
+    cy.wait('@deleteIngredient').then((interception) => {
+      expect(interception.response?.statusCode).to.equal(200);
+    });
+
+    // 5. テーブル内に保持したnameに該当するデータがないことを確認
+    cy.get('@targetName').then((name) => {
+      const deletedName = name as unknown as string;
+      cy.get('table').should('not.contain', deletedName);
+      cy.contains('tbody tr', deletedName).should('not.exist');
+    });
   });
 });
