@@ -10,4 +10,7 @@ App\Entity\Menu:
     ingredients: ["@ingredient_1", "@ingredient_2"]
   menu_{4..10}:
     name: "テストメニュー <current()>"
-    ingredients: ["@ingredient_*"]
+    ingredients: ["@ingredient_4", "@ingredient_5"]
+  unlinked_menu:
+    name: "削除用メニュー"
+    ingredients: ["@ingredient_1"]
