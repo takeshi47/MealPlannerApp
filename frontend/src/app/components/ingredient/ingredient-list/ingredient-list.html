@@ -23,29 +23,12 @@
               (complete)="completeEdit($event)"
             ></tr>
           } @else {
-            <tr>
-              <td class="px-3">
-                {{ ingredient.name }}
-              </td>
-              <td>
-                @if (ingredient.isStock) {
-                  <span class="badge bg-success">あり</span>
-                } @else {
-                  <span class="badge bg-secondary">なし</span>
-                }
-              </td>
-              <td class="text-end px-4">
-                <div class="btn-group btn-group-sm">
-                  <!-- btn-group-sm 追加 -->
-                  <button class="btn btn-outline-secondary" (click)="enableEdit(ingredient.id)">
-                    編集
-                  </button>
-                  <button class="btn btn-outline-danger" (click)="delete(ingredient.id)">
-                    削除
-                  </button>
-                </div>
-              </td>
-            </tr>
+            <tr
+              app-ingredient-list-item
+              [ingredient]="ingredient"
+              [csrfToken]="csrfToken"
+              (enableEdit)="enableEdit($event)"
+            ></tr>
           }
         } @empty {
           <!-- ingredients が空の場合の表示 -->
@@ -63,7 +46,8 @@
         }
         <tr>
           <td colspan="3">
-            <button class="btn btn-primary d-block w-100" (click)="enableAdd()">新しい材料を登録する
+            <button class="btn btn-primary d-block w-100" (click)="enableAdd()">
+              新しい材料を登録する
             </button>
           </td>
         </tr>

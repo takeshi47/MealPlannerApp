@@ -1,43 +1,33 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Ingredient } from '../../../models/ingredient';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { IngredientService } from '../../../services/ingredient-service';
 
 @Component({
   selector: 'tr[app-ingredient-list-item]',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule],
   templateUrl: './ingredient-list-item.html',
   styleUrl: './ingredient-list-item.scss',
 })
-export class IngredientListItem implements OnInit {
-  @Input({ required: true }) ingredient!: Ingredient;
+export class IngredientListItem {
+  @Input() ingredient!: Ingredient;
+  @Input({ required: true }) csrfToken = '';
+  @Output() completeDelete: EventEmitter<void> = new EventEmitter<void>();
+  @Output() enableEdit: EventEmitter<number> = new EventEmitter<number>();
 
-  private fb = inject(FormBuilder);
+  private ingredientService = inject(IngredientService);
 
-  protected isEdit = false;
-  protected form!: FormGroup;
-
-  ngOnInit(): void {
-    this.form = this.fb.group({
-      id: [this.ingredient.id],
-      name: [this.ingredient.name],
-      isStock: [this.ingredient.isStock],
+  delete(id: number): void {
+    this.ingredientService.delete(id, this.csrfToken).subscribe({
+      next: () => {
+        confirm('delete completed');
+        this.completeDelete.emit();
+      },
+      error: (error) => {
+        console.error(error);
+        alert(error.error);
+      },
     });
-  }
-
-  protected startEditing(): void {
-    this.isEdit = true;
-    this.form.reset(this.ingredient);
-  }
-
-  protected cancelEditing(): void {
-    this.isEdit = false;
-    this.form.reset(this.ingredient);
-  }
-
-  onSubmit(): void {
-    console.log('submit', this.form.value);
-    this.isEdit = false;
   }
 }

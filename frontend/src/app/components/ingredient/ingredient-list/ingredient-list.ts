@@ -3,10 +3,11 @@ import { IngredientService } from '../../../services/ingredient-service';
 import { Ingredient } from '../../../models/ingredient';
 import { CommonModule } from '@angular/common';
 import { IngredientForm } from '../ingredient-form/ingredient-form';
+import { IngredientListItem } from '../ingredient-list-item/ingredient-list-item';
 
 @Component({
   selector: 'app-ingredient-list',
-  imports: [CommonModule, IngredientForm],
+  imports: [CommonModule, IngredientForm, IngredientListItem],
   templateUrl: './ingredient-list.html',
   styleUrl: './ingredient-list.scss',
 })
@@ -77,18 +78,5 @@ export class IngredientList implements OnInit {
 
   isEdit(targetId: number): boolean {
     return this.editableIds.includes(targetId);
-  }
-
-  delete(id: number): void {
-    this.ingredientService.delete(id, this.csrfToken).subscribe({
-      next: () => {
-        this.load();
-        confirm('delete completed');
-      },
-      error: (error) => {
-        console.error(error);
-        alert(error.error);
-      },
-    });
   }
 }

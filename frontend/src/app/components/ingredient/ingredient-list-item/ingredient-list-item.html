@@ -1,50 +1,16 @@
-@if (isEdit) {
-  <!-- <ng-container app-ingredient-form [ingredient]="ingredient"></ng-container> -->
-
-  <ng-container [formGroup]="form">
-    <td>
-      <input
-        id="name_{{ ingredient.id }}"
-        type="text"
-        class="form-control"
-        formControlName="name"
-      />
-    </td>
-    <td>
-      <div class="form-check">
-        <input
-          type="checkbox"
-          class="form-check-input"
-          formControlName="isStock"
-          id="isStock_{{ ingredient.id }}"
-        />
-        <label for="isStock_{{ ingredient.id }}" class="form-check-label">ストック有無</label>
-      </div>
-    </td>
-    <td class="text-end">
-      <div class="btn-group">
-        <button class="btn btn-sm btn-outline-primary" type="submit" (click)="onSubmit()">
-          更新
-        </button>
-        <button class="btn btn-sm btn-outline-secondary" (click)="cancelEditing()">戻る</button>
-      </div>
-    </td>
-  </ng-container>
-} @else {
-  <td>
-    {{ ingredient.name }}
-  </td>
-  <td>
-    @if (ingredient.isStock) {
-      <span class="badge bg-success">Yes</span>
-    } @else {
-      <span class="badge bg-secondary">No</span>
-    }
-  </td>
-  <td class="text-end">
-    <div class="btn-group">
-      <button class="btn btn-sm btn-outline-info" (click)="startEditing()">編集</button>
-      <button class="btn btn-sm btn-outline-danger">削除</button>
-    </div>
-  </td>
-}
+<td class="px-3">
+  {{ ingredient.name }}
+</td>
+<td>
+  @if (ingredient.isStock) {
+    <span class="badge bg-success">あり</span>
+  } @else {
+    <span class="badge bg-secondary">なし</span>
+  }
+</td>
+<td class="text-end px-4">
+  <div class="btn-group btn-group-sm">
+    <button class="btn btn-outline-secondary" (click)="enableEdit.emit(ingredient.id)">編集</button>
+    <button class="btn btn-outline-danger" (click)="delete(ingredient.id)">削除</button>
+  </div>
+</td>
