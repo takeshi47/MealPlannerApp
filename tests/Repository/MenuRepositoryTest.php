@@ -26,6 +26,8 @@ class MenuRepositoryTest extends KernelTestCase
         $this->databaseTool->loadAliceFixture([
             $projectDir.'/tests/Fixtures/ingredients.yaml',
             $projectDir.'/tests/Fixtures/menus.yaml',
+            $projectDir.'/tests/Fixtures/dailies.yaml',
+            $projectDir.'/tests/Fixtures/meals.yaml',
         ]);
     }
 
@@ -54,5 +56,19 @@ class MenuRepositoryTest extends KernelTestCase
 
         $this->assertNotNull($menu);
         $this->assertCount(2, $menu->getIngredients());
+    }
+
+    /**
+     * isUsedInAnyMeal メソッドの判定テスト.
+     */
+    public function testIsUsedInAnyMeal(): void
+    {
+        // カレー (@menu_1) は Meal に紐付いている (meals.yaml で定義)
+        $linkedMenu = $this->repository->findOneBy(['name' => 'カレー']);
+        $this->assertTrue($this->repository->isUsedInAnyMeal($linkedMenu));
+
+        // 削除用メニュー (@unlinked_menu) は Meal に紐付いていない
+        $unlinkedMenu = $this->repository->findOneBy(['name' => '削除用メニュー']);
+        $this->assertFalse($this->repository->isUsedInAnyMeal($unlinkedMenu));
     }
 }
