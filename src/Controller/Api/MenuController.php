@@ -42,7 +42,15 @@ final class MenuController extends AbstractController
     #[Route(name: 'fetch_all', methods: ['GET'])]
     public function fetchAll(MenuRepository $menuRepository): Response
     {
-        return $this->json($menuRepository->findAll());
+        // todo: 下記ロジックはUseCase化する
+        $menus = $menuRepository->findAll();
+        $usedIds = $menuRepository->findUsedMenuIds();
+
+        foreach ($menus as $menu) {
+            $menu->setCanDelete(!in_array($menu->getId(), $usedIds, true));
+        }
+
+        return $this->json($menus);
     }
 
     #[Route(path: '/{id}', name: 'update', methods: ['PUT'], requirements: ['id' => '\d+'])]
@@ -63,8 +71,10 @@ final class MenuController extends AbstractController
     }
 
     #[Route(path: '/{id}', name: 'fetch', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function fetch(Menu $menu): Response
+    public function fetch(Menu $menu, MenuRepository $menuRepository): Response
     {
+        $menu->setCanDelete(!$menuRepository->isUsedInAnyMeal($menu));
+
         return $this->json($menu);
     }
 

@@ -35,4 +35,19 @@ class MenuRepository extends ServiceEntityRepository
 
         return (int) $result > 0;
     }
+
+    /**
+     * 現在使用されているメニューのIDをすべて取得する.
+     *
+     * @return int[]
+     */
+    public function findUsedMenuIds(): array
+    {
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select('DISTINCT menu.id')
+            ->from(Meal::class, 'm')
+            ->join('m.menu', 'menu')
+            ->getQuery()
+            ->getSingleColumnResult();
+    }
 }

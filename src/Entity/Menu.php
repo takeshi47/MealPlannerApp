@@ -35,6 +35,8 @@ class Menu
     #[Assert\Count(min: 1)]
     private Collection $ingredients;
 
+    private bool $canDelete = true;
+
     public function __construct()
     {
         $this->ingredients = new ArrayCollection();
@@ -80,6 +82,18 @@ class Menu
         if ($this->ingredients->removeElement($ingredient)) {
             $ingredient->removeMenu($this);
         }
+
+        return $this;
+    }
+
+    public function isCanDelete(): bool
+    {
+        return $this->canDelete;
+    }
+
+    public function setCanDelete(bool $canDelete): static
+    {
+        $this->canDelete = $canDelete;
 
         return $this;
     }
