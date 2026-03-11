@@ -214,7 +214,7 @@ export class DailyFormComponent implements OnInit {
    */
   newMeal(mealType: string | null): FormGroup {
     const form = this.fb.group({
-      mealType: [mealType ?? null],
+      mealType: [mealType ?? null, Validators.required],
       menu: this.fb.array([this.menuForm()]),
     });
 
