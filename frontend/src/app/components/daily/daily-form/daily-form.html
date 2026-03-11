@@ -26,11 +26,9 @@
           }
         </div>
       }
-      @if (errorMessages?.['date']) {
+      @for (msg of errorMessages?.['date'] | keyvalue; track $index) {
         <div class="invalid-feedback d-block">
-          @for (msg of errorMessages?.['date'] | keyvalue; track $index) {
-            {{ msg.value }}
-          }
+          {{ msg.value }}
         </div>
       }
     </div>
