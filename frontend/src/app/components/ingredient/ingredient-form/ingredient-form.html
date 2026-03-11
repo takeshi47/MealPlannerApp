@@ -6,7 +6,7 @@
         type="text"
         class="form-control"
         formControlName="name"
-        [class.is-invalid]="form.get('name')?.invalid && (form.get('name')?.dirty || form.get('name')?.touched)"
+        [class.is-invalid]="isInvalid('name')"
       />
       <div class="invalid-tooltip">
         @if (form.get('name')?.errors?.['required']) {

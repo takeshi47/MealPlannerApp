@@ -8,7 +8,12 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Ingredient } from '../../../models/ingredient';
 import { IngredientService } from '../../../services/ingredient-service';
 
@@ -91,5 +96,18 @@ export class IngredientForm implements OnInit {
         console.log(this.errorMessages);
       },
     });
+  }
+
+  protected isInvalid(type: string): boolean {
+    const targetForm = this.form.get(type) as FormControl;
+
+    if (targetForm.invalid && (targetForm.dirty || targetForm.touched)) {
+      return true;
+    }
+    if (this.errorMessages && this.errorMessages[type]) {
+      return true;
+    }
+
+    return false;
   }
 }
