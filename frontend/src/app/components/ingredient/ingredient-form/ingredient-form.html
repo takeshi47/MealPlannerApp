@@ -6,11 +6,17 @@
         type="text"
         class="form-control"
         formControlName="name"
-        [class.is-invalid]="errorMessages?.['name']"
+        [class.is-invalid]="form.get('name')?.invalid && (form.get('name')?.dirty || form.get('name')?.touched)"
       />
       <div class="invalid-tooltip">
+        @if (form.get('name')?.errors?.['required']) {
+          <div>名前を入力してください。</div>
+        }
+        @if (form.get('name')?.errors?.['maxlength']) {
+          <div>名前は30文字以内で入力してください。</div>
+        }
         @for (msg of errorMessages && errorMessages['name']; track $index) {
-          {{ msg }}
+          <div>{{ msg }}</div>
         }
       </div>
     </div>
@@ -28,7 +34,12 @@
   </td>
   <td class="text-end px-4">
     <div class="btn-group">
-      <button class="btn btn-sm btn-outline-primary" type="submit" (click)="onSubmit()">
+      <button
+        class="btn btn-sm btn-outline-primary"
+        type="submit"
+        (click)="onSubmit()"
+        [disabled]="form.invalid"
+      >
         保存
       </button>
       <button class="btn btn-sm btn-outline-secondary" (click)="cancel()">戻る</button>

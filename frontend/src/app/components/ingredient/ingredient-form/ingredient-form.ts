@@ -8,7 +8,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Ingredient } from '../../../models/ingredient';
 import { IngredientService } from '../../../services/ingredient-service';
 
@@ -34,7 +34,7 @@ export class IngredientForm implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   form = this.fb.group({
-    name: '',
+    name: ['', [Validators.required, Validators.maxLength(30)]],
     isStock: false,
   });
 
