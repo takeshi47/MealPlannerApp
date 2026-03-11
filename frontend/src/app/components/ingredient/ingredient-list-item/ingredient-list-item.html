@@ -12,7 +12,7 @@
   <div class="btn-group btn-group-sm">
     <button class="btn btn-outline-secondary" (click)="enableEdit.emit(ingredient.id)">編集</button>
     @if (ingredient.canDelete) {
-      <button class="btn btn-outline-danger" (click)="delete(ingredient.id)">削除</button>
+      <button class="btn btn-outline-danger" (click)="delete()">削除</button>
     }
   </div>
 </td>

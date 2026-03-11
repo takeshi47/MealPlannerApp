@@ -26,8 +26,6 @@ export class IngredientList implements OnInit {
 
     this.ingredientService.fetchCsrfToken().subscribe((token) => {
       this.csrfToken = token;
-      console.log(this.csrfToken);
-
     });
   }
 
@@ -36,6 +34,10 @@ export class IngredientList implements OnInit {
       this.ingredients = i;
       this.cdr.markForCheck();
     });
+  }
+
+  protected deleteIngredient(id: number): void {
+    this.ingredients = this.ingredients.filter((i) => i.id !== id);
   }
 
   enableAdd(): void {

@@ -18,11 +18,13 @@ export class IngredientListItem {
 
   private ingredientService = inject(IngredientService);
 
-  delete(id: number): void {
-    this.ingredientService.delete(id, this.csrfToken).subscribe({
+  delete(): void {
+    if(!confirm('本当に削除していいですか？')) return;
+
+    this.ingredientService.delete(this.ingredient.id, this.csrfToken).subscribe({
       next: () => {
         // todo: alertをUI通知に変更
-        alert('delete completed');
+        alert('削除が完了したよ！');
         this.completeDelete.emit();
       },
       error: (error) => {
