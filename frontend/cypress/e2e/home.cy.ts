@@ -13,10 +13,7 @@ describe('ホーム画面のテスト', () => {
     cy.clock(now.getTime(), ['Date']);
 
     // ログイン処理
-    cy.visit('/login');
-    cy.get('input[formControlName="email"]').clear().type('admin@example.com');
-    cy.get('input[formControlName="password"]').clear().type('password');
-    cy.get('button[type="submit"]').should('not.be.disabled').click();
+    cy.login();
 
     cy.wait('@loginRequest');
     cy.visit('/home');

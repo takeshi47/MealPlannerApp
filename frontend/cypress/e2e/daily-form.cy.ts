@@ -16,11 +16,7 @@ describe('献立登録フォームのテスト', () => {
     cy.clock(now.getTime(), ['Date']);
 
     // ログイン処理
-    cy.visit('/login');
-    cy.get('input[formControlName="email"]').clear().type('admin@example.com');
-    cy.get('input[formControlName="password"]').clear().type('password');
-    cy.get('button[type="submit"]').should('not.be.disabled').click();
-    cy.wait('@loginRequest');
+    cy.login();
 
     // ホーム画面遷移確認
     cy.url().should('include', '/home');

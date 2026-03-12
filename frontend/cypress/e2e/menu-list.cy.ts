@@ -1,18 +1,14 @@
 describe('メニュー一覧画面のテスト', () => {
   beforeEach(() => {
+    cy.request('POST', '/api/test/database-reset');
+
     // APIリクエストの監視とモック
     cy.intercept('POST', '**/api/login').as('loginRequest');
     cy.intercept('GET', '**/api/menu').as('getMenus');
 
-    cy.intercept('GET', '**/api/menu/csrf-token/menu_delete', { token: 'mock-token' }).as(
-      'getCsrfToken',
-    );
-
     // ログイン処理
-    cy.visit('/login');
-    cy.get('input[formControlName="email"]').clear().type('admin@example.com');
-    cy.get('input[formControlName="password"]').clear().type('password');
-    cy.get('button[type="submit"]').should('not.be.disabled').click();
+    cy.login();
+    cy.wait('@loginRequest');
 
     // メニュー一覧へ遷移
     cy.visit('/menu/list');
