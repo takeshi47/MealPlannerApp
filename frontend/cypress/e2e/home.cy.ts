@@ -43,5 +43,9 @@ describe('ホーム画面のテスト', () => {
     cy.contains('label', 'month').click();
     cy.wait('@fetchDaily');
     cy.get('.daily-grid-month').should('exist');
+
+    // 2026年3月の場合、最初の日付は 2026-02-23 (月)、最後は 2026-04-05 (日)
+    cy.get('.daily-grid-month .card-header').first().should('contain', '2026-02-23');
+    cy.get('.daily-grid-month .card-header').last().should('contain', '2026-04-05');
   });
 });
