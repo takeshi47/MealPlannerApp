@@ -1,7 +1,6 @@
 describe('献立登録フォーム：異常系・制約テスト', () => {
   before(() => {
-    // フィクスチャのロード
-    cy.exec('php ../bin/console doctrine:fixtures:load --no-interaction --env=test');
+    cy.request('POST', '/api/test/database-reset');
   });
 
   beforeEach(() => {

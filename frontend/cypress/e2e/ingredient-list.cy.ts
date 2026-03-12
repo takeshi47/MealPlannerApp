@@ -1,7 +1,6 @@
 describe('材料フォームのテスト', () => {
   before(() => {
-    // todo: ｃｙ．ｔｓ側で直接実行しない
-    cy.exec('php ../bin/console doctrine:fixtures:load --no-interaction --env=test');
+    cy.request('POST', '/api/test/database-reset');
   });
 
   beforeEach(() => {
@@ -106,9 +105,9 @@ describe('材料フォームのテスト', () => {
     cy.get('tr[app-ingredient-form]').within(() => {
       cy.get('input[formControlName="name"]').clear().type(duplicateName);
       cy.contains('保存').click();
-      
+
       cy.wait('@createIngredient').its('response.statusCode').should('eq', 400);
-      
+
       // input をスクロールして視認性を確保
       cy.get('input[formControlName="name"]').scrollIntoView().should('be.visible');
       // invalid-tooltip 内にエラーメッセージが含まれていること
