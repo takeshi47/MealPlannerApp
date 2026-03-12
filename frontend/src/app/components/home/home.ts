@@ -40,7 +40,7 @@ export class Home implements OnInit {
   }
 
   private load(): void {
-    const strDate = this.baseDate.toISOString().substring(0, 10);
+    const strDate = DateUtil.getFormattedDate(this.baseDate);
     this.dailyService.fetch(strDate, this.selectedViewMode).subscribe((res) => {
       this.dailyMeals = res;
       this.cdr.markForCheck();
