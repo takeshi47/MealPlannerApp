@@ -3,7 +3,7 @@
 @if (user$ | async; as user) {
   <a [routerLink]="['/user/edit', user.id]">edit</a>
   @if (user.id) {
-    <button (click)="deleteUser(user.id)" [disabled]="csrfTokenDelete">delete</button>
+    <button (click)="deleteUser(user.id)" [disabled]="!csrfTokenDelete">delete</button>
   }
 
   <pre>

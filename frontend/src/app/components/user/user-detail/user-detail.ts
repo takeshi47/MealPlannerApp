@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { UserService } from '../../../services/user-service';
 import { Observable, switchMap } from 'rxjs';
 import { User } from '../../../models/user';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 })
 export class UserDetail implements OnInit {
   private activatedRouter = inject(ActivatedRoute);
+  private router = inject(Router);
   private userService = inject(UserService);
   private _csrfTokenDelete: string | null = null;
 
@@ -45,8 +46,19 @@ export class UserDetail implements OnInit {
       return;
     }
 
+    if (!confirm('本当に削除していいですか？')) {
+      return;
+    }
+
     this.userService.delete(id, this.csrfTokenDelete).subscribe({
-      error: (error) => alert(error.message),
+      next: () => {
+        alert('削除したよ！');
+        this.router.navigate(['user/list']);
+      },
+      error: (error) => {
+        console.error(error);
+        alert(error.message);
+      },
     });
   }
 
