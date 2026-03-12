@@ -15,9 +15,15 @@ describe('DateUtil', () => {
 
   describe('getFormattedDate()', () => {
     it('YYYY-MM-DD 形式の文字列を返すこと', () => {
-      // UTCで指定
-      const date = new Date(Date.UTC(2026, 2, 8)); // 2026-03-08
+      const date = new Date(2026, 2, 8); // ローカル時刻の2026-03-08
       expect(DateUtil.getFormattedDate(date)).toBe('2026-03-08');
+    });
+
+    it('深夜の時間帯でもローカルの日付を正しく返すこと（タイムゾーンのズレ防止）', () => {
+      // 日本時間 (UTC+9) で 3月1日 01:00 の場合、UTC では 2月28日 16:00
+      // 以前の toISOString().substring(0, 10) だと "2026-02-28" になっていたバグの確認
+      const date = new Date(2026, 2, 1, 1, 0, 0); 
+      expect(DateUtil.getFormattedDate(date)).toBe('2026-03-01');
     });
 
     it('一桁の月日が 0 埋めされること', () => {
