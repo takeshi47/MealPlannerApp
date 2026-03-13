@@ -6,9 +6,7 @@
     <button (click)="deleteUser(user.id)" [disabled]="!csrfTokenDelete">delete</button>
   }
 
-  <pre>
-        {{ user | json }}
-    </pre
-  >
+
+  <pre>{{ user | json }}</pre>
 }
 <a [routerLink]="['/user/list']">back to list</a>
