@@ -99,7 +99,7 @@ describe('ユーザー管理のCRUDテスト', () => {
     cy.get('#password_first').type('password123');
     cy.get('#password_second').type('password-different');
 
-    cy.contains('Passwords do not match.').should('be.visible');
+    cy.contains('パスワードが一致してないよ').should('be.visible');
 
     cy.get('button[type="submit"]').should('be.disabled');
   });
