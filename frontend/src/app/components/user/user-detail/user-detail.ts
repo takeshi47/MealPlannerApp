@@ -1,8 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { UserService } from '../../../services/user-service';
-import { Observable, switchMap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { User } from '../../../models/user';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -13,31 +13,29 @@ import { CommonModule } from '@angular/common';
 })
 export class UserDetail implements OnInit {
   private activatedRouter = inject(ActivatedRoute);
+  private router = inject(Router);
   private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
+
   private _csrfTokenDelete: string | null = null;
 
   user$!: Observable<User>;
 
   ngOnInit(): void {
-    this.activatedRouter.paramMap
-      .pipe(
-        switchMap((params) => {
-          const id = Number(params.get('id'));
-
-          this.user$ = this.userService.getUser(id);
-
-          return this.user$;
-        }),
-      )
-      .subscribe((user) => {
-        if (!user.id) {
-          return;
+    this.user$ = this.activatedRouter.paramMap.pipe(
+      switchMap((params) => {
+        const id = Number(params.get('id'));
+        return this.userService.getUser(id);
+      }),
+      tap((user) => {
+        if (user.id) {
+          this.userService.fetchCsrfTokenDelete(user.id).subscribe((token) => {
+            this._csrfTokenDelete = token;
+            this.cdr.markForCheck();
+          });
         }
-
-        this.userService
-          .fetchCsrfTokenDelete(user.id)
-          .subscribe((token) => (this._csrfTokenDelete = token));
-      });
+      }),
+    );
   }
 
   protected deleteUser(id: number): void {
@@ -45,8 +43,19 @@ export class UserDetail implements OnInit {
       return;
     }
 
+    if (!confirm('本当に削除していいですか？')) {
+      return;
+    }
+
     this.userService.delete(id, this.csrfTokenDelete).subscribe({
-      error: (error) => alert(error.message),
+      next: () => {
+        alert('削除したよ！');
+        this.router.navigate(['user/list']);
+      },
+      error: (error) => {
+        console.error(error);
+        alert(error.message);
+      },
     });
   }
 

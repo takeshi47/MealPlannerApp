@@ -1,14 +1,7 @@
 describe('メニュー一覧画面のテスト', () => {
   beforeEach(() => {
-    cy.request('POST', '/api/test/database-reset');
-
-    // APIリクエストの監視とモック
-    cy.intercept('POST', '**/api/login').as('loginRequest');
-    cy.intercept('GET', '**/api/menu').as('getMenus');
-
     // ログイン処理
     cy.login();
-    cy.wait('@loginRequest');
 
     // メニュー一覧へ遷移
     cy.visit('/menu/list');

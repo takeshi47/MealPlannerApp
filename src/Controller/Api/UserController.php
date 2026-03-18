@@ -50,7 +50,7 @@ final class UserController extends AbstractController
             return $this->json(null, Response::HTTP_CREATED);
         }
 
-        $errors = $this->getErrorsFromForm($form);
+        $errors = $this->getErrorsFromForm2($form);
 
         return $this->json($errors, Response::HTTP_BAD_REQUEST);
     }
@@ -72,7 +72,7 @@ final class UserController extends AbstractController
             return $this->json(null, Response::HTTP_CREATED);
         }
 
-        $errors = $this->getErrorsFromForm($form);
+        $errors = $this->getErrorsFromForm2($form);
 
         return $this->json($errors, Response::HTTP_BAD_REQUEST);
     }

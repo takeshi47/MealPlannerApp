@@ -3,13 +3,14 @@ import { UserService } from '../../../services/user-service';
 import {
   AbstractControl,
   FormBuilder,
+  FormControl,
   ReactiveFormsModule,
   ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, switchMap } from 'rxjs';
+import { finalize, of, switchMap } from 'rxjs';
 
 function passwordMatcher(control: AbstractControl): ValidationErrors | null {
   const plainPassword = control.get('first');
@@ -22,9 +23,7 @@ function passwordMatcher(control: AbstractControl): ValidationErrors | null {
   return { passwordsMismatch: true };
 }
 
-export interface BackendFormErrors {
-  [key: string]: BackendFormErrors;
-}
+export type BackendFormErrors = Record<string, string[]>;
 
 @Component({
   selector: 'app-user-form',
@@ -42,15 +41,16 @@ export class UserForm implements OnInit {
   private csrfToken = '';
   private userId: number | null = null;
 
+  protected isLoading = true;
   protected errorMessages: BackendFormErrors | null = null;
   protected allRoles = ['ROLE_USER', 'ROLE_ADMIN'];
 
   form = this.fb.group({
-    email: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
     plainPassword: this.fb.group(
       {
-        first: [null, [Validators.required]],
-        second: [null],
+        first: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(16)]],
+        second: [''],
       },
       { validators: passwordMatcher },
     ),
@@ -75,6 +75,7 @@ export class UserForm implements OnInit {
         }),
       )
       .subscribe((user) => {
+        this.isLoading = false;
         if (!user) {
           return;
         }
@@ -95,6 +96,7 @@ export class UserForm implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.errorMessages = null;
 
     if (this.userId) {
@@ -110,15 +112,23 @@ export class UserForm implements OnInit {
       _token: this.csrfToken,
     };
 
-    this.userService.create(payload).subscribe({
-      next: () => {
-        this.router.navigate(['user/list']);
-      },
-      error: (error) => {
-        this.errorMessages = error.error;
-        this.cdr.markForCheck();
-      },
-    });
+    this.userService
+      .create(payload)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['user/list']);
+        },
+        error: (error) => {
+          this.errorMessages = error.error;
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   private update(): void {
@@ -131,18 +141,39 @@ export class UserForm implements OnInit {
       _token: this.csrfToken,
     };
 
-    this.userService.update(this.userId, payload).subscribe({
-      next: () => {
-        this.router.navigate(['user/list']);
-      },
-      error: (error) => {
-        this.errorMessages = error.error;
-        this.cdr.markForCheck();
-      },
-    });
+    this.userService
+      .update(this.userId, payload)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['user/list']);
+        },
+        error: (error) => {
+          this.errorMessages = error.error;
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   protected get isEditMode(): boolean {
     return this.userId !== null;
+  }
+
+  protected isInvalid(type: string): boolean {
+    const targetForm = this.form.get(type) as FormControl;
+
+    if (targetForm.invalid && (targetForm.dirty || targetForm.touched)) {
+      return true;
+    }
+    if (this.errorMessages && this.errorMessages[type]) {
+      return true;
+    }
+
+    return false;
   }
 }

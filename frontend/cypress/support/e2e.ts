@@ -15,3 +15,20 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+
+// 全てのテストでグローバルに confirm と alert を自動承諾する設定
+Cypress.on('window:confirm', () => true);
+Cypress.on('window:alert', () => true);
+
+// 全てのテスト実行前の共通セットアップ
+beforeEach(() => {
+  // セッション情報のクリア
+  cy.clearCookies();
+  cy.clearLocalStorage();
+
+  // データベースのリセット (テストの独立性を高める)
+  cy.resetDatabase();
+
+  // 基本的なAPIのインターセプト
+  cy.interceptBasicApi();
+});

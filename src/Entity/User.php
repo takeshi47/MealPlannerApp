@@ -37,8 +37,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Assert\NotBlank()]
     private array $roles = [];
+
+    #[Groups(['user:read'])]
+    #[Assert\NotBlank()]
+    private ?string $role = null;
 
     /**
      * @var string The hashed password
@@ -108,15 +111,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     public function getRole(): ?string
     {
-        if (empty($this->roles)) {
-            return null;
+        if ($this->role === null && !empty($this->roles)) {
+            $this->role = $this->roles[0];
         }
 
-        return $this->roles[0];
+        return $this->role;
     }
 
     public function setRole(?string $role): void
     {
+        $this->role = $role;
         if ($role === null) {
             return;
         }

@@ -1,13 +1,5 @@
 describe('ホーム画面のテスト', () => {
-  before(() => {
-    cy.request('POST', '/api/test/database-reset');
-  });
-
   beforeEach(() => {
-    // APIリクエストの監視
-    cy.intercept('POST', '**/api/login').as('loginRequest');
-    cy.intercept('POST', '**/api/daily').as('fetchDaily');
-
     // 時刻固定 (2026-03-01)
     const now = new Date(2026, 2, 1, 12, 0, 0);
     cy.clock(now.getTime(), ['Date']);
@@ -15,8 +7,7 @@ describe('ホーム画面のテスト', () => {
     // ログイン処理
     cy.login();
 
-    cy.wait('@loginRequest');
-    cy.visit('/home');
+    cy.url().should('include', '/home');
     cy.wait('@fetchDaily');
   });
 

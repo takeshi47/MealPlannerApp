@@ -24,6 +24,11 @@ trait ApiControllerTrait
         // /todo
     }
 
+    /**
+     * todo: リファクタリング（getErrorsFromForm2との統合）.
+     *
+     * @deprecated
+     */
     private function getErrorsFromForm(FormInterface $form): array
     {
         $errors = [];
@@ -49,5 +54,36 @@ trait ApiControllerTrait
         }
 
         return $errors; // 整形されたエラー配列を返す
+    }
+
+    // todo: リファクタリング（getErrorsFromFormとの統合）
+    private function getErrorsFromForm2(FormInterface $form, string $prefix = ''): array
+    {
+        $errors = [];
+
+        // 1. 現在のフォームに紐づいているエラーを処理する
+        foreach ($form->getErrors() as $error) {
+            $origin = $error->getOrigin();
+            $key = $prefix ?: 'global';
+
+            if ($origin && $origin !== $form) {
+                $childName = $origin->getName();
+                $key = $prefix ? $prefix.'.'.$childName : $childName;
+            }
+
+            $errors[$key][] = $error->getMessage();
+        }
+
+        // 2. 子要素を再帰的に回す（ここは今のままでOK！）
+        foreach ($form->all() as $child) {
+            $childPrefix = $prefix ? $prefix.'.'.$child->getName() : $child->getName();
+            $childErrors = $this->getErrorsFromForm2($child, $childPrefix);
+
+            foreach ($childErrors as $key => $messages) {
+                $errors[$key] = array_merge($errors[$key] ?? [], $messages);
+            }
+        }
+
+        return $errors;
     }
 }

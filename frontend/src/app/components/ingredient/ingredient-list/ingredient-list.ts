@@ -26,6 +26,7 @@ export class IngredientList implements OnInit {
 
     this.ingredientService.fetchCsrfToken().subscribe((token) => {
       this.csrfToken = token;
+      this.cdr.markForCheck();
     });
   }
 

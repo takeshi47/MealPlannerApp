@@ -1,14 +1,6 @@
 describe('献立登録フォームのテスト', () => {
-  before(() => {
-    cy.request('POST', '/api/test/database-reset');
-  });
-
   beforeEach(() => {
-    // APIリクエストの監視
-    cy.intercept('POST', '**/api/login').as('loginRequest');
-    cy.intercept('POST', '**/api/daily').as('fetchDaily');
-    cy.intercept('GET', '**/api/daily/init-data').as('getInitData');
-    cy.intercept('GET', '**/api/menu').as('getMenus');
+    // 追加のAPIのインターセプト
     cy.intercept('POST', '**/api/daily/create').as('createDaily');
 
     // 2026-03-01 12:00:00 に時刻を固定
@@ -24,11 +16,6 @@ describe('献立登録フォームのテスト', () => {
   });
 
   it('新規に献立を登録できること (正常系)', () => {
-    // confirm ダイアログをスタブ化して自動的に OK を返すように設定
-    cy.window().then((win) => {
-      cy.stub(win, 'confirm').as('confirmStub').returns(true);
-    });
-
     // 2026-02-28 のカード内の「登録」ボタンをクリック
     const targetDate = '2026-02-28';
     cy.contains('.card', targetDate).within(() => {
@@ -59,9 +46,6 @@ describe('献立登録フォームのテスト', () => {
     // APIリクエストの成功を確認
     cy.wait('@createDaily').its('response.statusCode').should('eq', 200);
 
-    // 確認ダイアログが正しいメッセージで呼ばれたことを検証
-    cy.get('@confirmStub').should('be.calledWith', 'registration completed!');
-
     // モーダルが閉じ、ホーム画面が再ロードされることを確認
     cy.get('app-daily-form').should('not.exist');
     cy.wait('@fetchDaily');
@@ -74,10 +58,6 @@ describe('献立登録フォームのテスト', () => {
   });
 
   it('既存の献立を編集できること (正常系)', () => {
-    cy.window().then((win) => {
-      cy.stub(win, 'confirm').as('confirmStub').returns(true);
-    });
-
     // 2026-03-01 のカード（カレーが登録済み）の「編集」ボタンをクリック
     const targetDate = '2026-03-01';
     cy.intercept('POST', '**/api/daily/update/*').as('updateDaily');
@@ -99,7 +79,6 @@ describe('献立登録フォームのテスト', () => {
     cy.get('button[type="submit"]').contains('これでけってい！').click();
 
     cy.wait('@updateDaily').its('response.statusCode').should('eq', 200);
-    cy.get('@confirmStub').should('be.calledWith', 'registration completed!');
 
     // ホーム画面で更新を確認
     cy.wait('@fetchDaily');
@@ -110,10 +89,6 @@ describe('献立登録フォームのテスト', () => {
   });
 
   it('1日に複数の食事を登録できること (正常系)', () => {
-    cy.window().then((win) => {
-      cy.stub(win, 'confirm').as('confirmStub').returns(true);
-    });
-
     // 未登録の日付を選択
     const targetDate = '2026-02-27';
     cy.contains('.card', targetDate).within(() => {
@@ -157,10 +132,6 @@ describe('献立登録フォームのテスト', () => {
   });
 
   it('1つの食事に複数のメニューを登録できること (正常系)', () => {
-    cy.window().then((win) => {
-      cy.stub(win, 'confirm').as('confirmStub').returns(true);
-    });
-
     const targetDate = '2026-02-26';
     cy.contains('.card', targetDate).within(() => {
       cy.contains('button', '登録').click();

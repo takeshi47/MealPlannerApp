@@ -4,41 +4,43 @@
   <!-- email form -->
   <div>
     <label for="email">Email</label>
-    <input id="email" formControlName="email" type="text" />
+    <input id="email" formControlName="email" type="text" [class.is-invalid]="isInvalid('email')" />
 
-    @if (form.get('email')?.invalid && form.get('email')?.touched) {
-      <div>
+    @if (isInvalid('email')) {
+      <div class="invalid-feedback">
         @if (form.get('email')?.hasError('required')) {
           <small>Email is required</small>
         }
 
         @if (form.get('email')?.hasError('email')) {
-          <small>Please enter a valid email format.</small>
+          <small>メールアドレスの形式で入力してね！</small>
+        }
+        @for (error of errorMessages?.['email']; track $index) {
+          <div>{{ error }}</div>
         }
       </div>
-    }
-
-    @for (error of errorMessages?.['email'] | keyvalue; track $index) {
-      <div>{{ error.value }}</div>
     }
   </div>
 
   <!-- displayName form -->
   <div>
     <label for="displayName">DisplayName</label>
-    <input id="displayName" formControlName="displayName" type="text" />
+    <input
+      id="displayName"
+      formControlName="displayName"
+      type="text"
+      [class.is-invalid]="isInvalid('displayName')"
+    />
 
-    @if (form.get('displayName')?.invalid && form.get('displayName')?.touched) {
-      <div>
+    @if (isInvalid('displayName')) {
+      <div class="invalid-feedback">
         @if (form.get('displayName')?.hasError('required')) {
           <small>DisplayName is required</small>
         }
-      </div>
-    }
-    @if (errorMessages && errorMessages['displayName']) {
-      <div>
-        @for (error of errorMessages['displayName'] | keyvalue; track $index) {
-          <div>{{ error.value }}</div>
+        @if (errorMessages && errorMessages['displayName']) {
+          @for (error of errorMessages['displayName'] | keyvalue; track $index) {
+            <div>{{ error.value }}</div>
+          }
         }
       </div>
     }
@@ -48,50 +50,68 @@
   <div formGroupName="plainPassword">
     <div>
       <label for="password_first">Password</label>
-      <input id="password_first" type="password" formControlName="first" />
+      <input
+        id="password_first"
+        type="password"
+        formControlName="first"
+        [class.is-invalid]="isInvalid('plainPassword.first')"
+      />
       <!-- エラー表示 (first) -->
+      @if (isInvalid('plainPassword.first')) {
+        <div class="invalid-feedback">
+          @if (form.get('plainPassword.first')?.hasError('required')) {
+            <small>パスワードは必須だよ</small>
+          }
+          @if (form.get('plainPassword.first')?.hasError('minlength')) {
+            <small>パスワードは8文字以上で入力してね！</small>
+          }
+          @if (form.get('plainPassword.first')?.hasError('maxlength')) {
+            <small>パスワードは17文字以下で入力してね！</small>
+          }
+          @for (msg of errorMessages?.['plainPassword.first']; track $index) {
+            <small>{{ msg }}</small>
+          }
+        </div>
+      }
     </div>
-    @if (errorMessages?.['plainPassword']?.['first']) {
-      <div>
-        @for (msg of errorMessages?.['plainPassword']?.['first'] | keyvalue; track $index) {
-          <div>{{ msg.value }}</div>
-        }
-      </div>
-    }
+
     <div>
       <label for="password_second">Confirm Password</label>
-      <input id="password_second" type="password" formControlName="second" />
+      <input
+        id="password_second"
+        type="password"
+        formControlName="second"
+        [class.is-invalid]="isInvalid('plainPassword')"
+      />
       <!-- エラー表示 (second) -->
+      @if (isInvalid('plainPassword')) {
+        <div class="invalid-feedback">
+          <small>パスワードが一致してないよ</small>
+        </div>
+      }
     </div>
-    @if (form.get('plainPassword')?.hasError('passwordsMismatch')) {
-      <div class="error">
-        <small>Passwords do not match.</small>
-      </div>
-    }
   </div>
 
   <!-- role form -->
   <div>
     <label for="role">Role</label>
-    <select id="role" formControlName="role" placeholder=" ">
+    <select id="role" formControlName="role" placeholder="" [class.is-invalid]="isInvalid('role')">
       <option [value]="null">-</option>
       @for (role of allRoles; track $index) {
         <option [value]="role">{{ role }}</option>
       }
     </select>
-    @if (form.get('role')?.invalid && form.get('role')?.touched) {
-      <div class="error">
-        <small>At least one role must be selected.</small>
-      </div>
-    }
-    @if (errorMessages && errorMessages['role']) {
-      <div class="error-message">
-        @for (error of errorMessages['role'] | keyvalue; track $index) {
+    @if (isInvalid('role')) {
+      <div class="invalid-feedback">
+        @if (form.get('role')?.getError('required')) {
+          <small class="text-danger">権限を選んでね！</small>
+        }
+        @for (error of errorMessages?.['role']; track $index) {
           <div>{{ error }}</div>
         }
       </div>
     }
   </div>
 
-  <button type="submit" [disabled]="form.invalid">{{ isEditMode ? 'edit' : ' create' }}</button>
+  <button type="submit" [disabled]="isLoading || form.invalid">{{ isEditMode ? 'edit' : ' create' }}</button>
 </form>
